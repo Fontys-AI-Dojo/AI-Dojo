@@ -178,7 +178,14 @@
       )).join("<br>");
     }
 
-    setText("dateShort", current.dateShort);
+    // Yellow poster note is small: "Woensdag 11 november 2026" becomes "11 november".
+    function posterDate(date) {
+      const withoutYear = date.replace(/\s+\d{4}$/, "");
+      const parts = withoutYear.split(/\s+/);
+      return parts.length >= 2 ? parts.slice(-2).join(" ") : withoutYear;
+    }
+
+    setText("dateShort", posterDate(current.date));
     setText("time", current.time);
     setText("eyebrow", current.place[0].replace(/^Gebouw\s+/i, ""));
 
