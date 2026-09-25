@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI-Dojo voor Fontys-people — laagdrempelig samenkomen, prutsen en leren. Dinsdag 14 juli in het Fontys AI-Lab, Strijp-T.">
+  <meta name="description" content="AI-Dojo voor Fontys-people — laagdrempelig samenkomen, prutsen en leren.">
   <title>AI-Dojo · Learn by prutsing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +19,7 @@
   </div>
 
   <header class="hero">
-    <p class="hero__eyebrow">Fontys · Strijp-T 🦝</p>
+    <p class="hero__eyebrow">Fontys · <span data-bind="eyebrow">Nexus</span> 🦝</p>
     <h1 class="hero__title">AI-Dojo</h1>
     <p class="hero__tagline">Learn by prutsing</p>
     <p class="hero__subtitle">Come and fail with the professionals.</p>
@@ -29,13 +29,22 @@
     <section class="poster-section" aria-labelledby="poster-heading">
       <h2 id="poster-heading" class="visually-hidden">Poster</h2>
       <figure class="poster">
-        <img
-          src="ai.dojo.14juli2026.jpg"
-          alt="AI-Dojo poster: dinsdag 14 juli, Fontys AI-Lab Strijp-T, aanmelden via e-mail"
-          width="1200"
-          height="1697"
-          loading="eager"
-        >
+        <div class="poster__frame">
+          <img
+            src="ai.dojo.poster.jpg"
+            alt="AI-Dojo poster: wasbeer in judopak. Datum en plek staan als tekst op de gele briefjes."
+            width="1536"
+            height="1024"
+            loading="eager"
+          >
+          <p class="poster__note poster__note--when">
+            <span data-bind="dateShort"></span>
+            <span data-bind="time"></span>
+          </p>
+          <p class="poster__note poster__note--where">
+            <span data-bind="placeLines"></span>
+          </p>
+        </div>
       </figure>
     </section>
 
@@ -45,18 +54,14 @@
         <article class="sticky sticky--yellow sticky--tilt-left">
           <span class="sticky__icon" aria-hidden="true">📅</span>
           <h3>Wanneer?</h3>
-          <p><strong>Dinsdag 14 juli 2026</strong><br>14:00 – 16:00</p>
+          <p data-bind="whenSticky"></p>
+          <p class="sticky__note" data-bind="tentative" hidden></p>
         </article>
 
         <article class="sticky sticky--pink sticky--tilt-right">
           <span class="sticky__icon" aria-hidden="true">📍</span>
           <h3>Waar?</h3>
-          <p>
-            <strong>Fontys AI-Lab</strong><br>
-            TQ4.1-403<br>
-            Strijp-T, gebouw Q<br>
-            <em>(over de loopbrug)</em>
-          </p>
+          <p data-bind="whereSticky"></p>
         </article>
 
         <article class="sticky sticky--yellow sticky--tilt-right sticky--wide">
@@ -71,6 +76,14 @@
           </a>
         </article>
       </div>
+    </section>
+
+    <section class="history-section" aria-labelledby="history-heading">
+      <h2 id="history-heading" class="visually-hidden">Vorige keren</h2>
+      <details class="history" id="vorige">
+        <summary class="history__summary">Vorige keren</summary>
+        <div class="history__list" data-bind="history"></div>
+      </details>
     </section>
 
     <section class="about" aria-labelledby="about-heading">
@@ -146,8 +159,66 @@
     <p class="site-footer__meta">Fontys AI-Dojo · <span id="year"></span></p>
   </footer>
 
+  <script src="editions.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    const edition = window.AI_DOJO;
+    const current = edition.current;
+
+    function setText(name, value) {
+      document.querySelectorAll(`[data-bind="${name}"]`).forEach((node) => {
+        node.textContent = value;
+      });
+    }
+
+    function placeHtml(lines) {
+      return lines.map((line, index) => (
+        index === 0 ? `<strong>${line}</strong>` : line
+      )).join("<br>");
+    }
+
+    setText("dateShort", current.dateShort);
+    setText("time", current.time);
+    setText("eyebrow", current.place[0].replace(/^Gebouw\s+/i, ""));
+
+    document.querySelectorAll('[data-bind="placeLines"]').forEach((node) => {
+      node.innerHTML = current.place.join("<br>");
+    });
+
+    document.querySelector('[data-bind="whenSticky"]').innerHTML =
+      `<strong>${current.date}</strong><br>${current.time}`;
+
+    document.querySelector('[data-bind="whereSticky"]').innerHTML =
+      placeHtml(current.place);
+
+    const tentative = document.querySelector('[data-bind="tentative"]');
+    if (current.tentative && current.placeNote) {
+      tentative.hidden = false;
+      tentative.textContent = current.placeNote;
+    }
+
+    const description = document.querySelector('meta[name="description"]');
+    description.content =
+      `AI-Dojo voor Fontys-people — ${current.date}, ${current.time}, ${current.place.join(", ")}.`;
+
+    const history = document.querySelector('[data-bind="history"]');
+    history.innerHTML = edition.past.map((item) => `
+      <article class="history__item">
+        <p class="history__facts">
+          <strong>${item.date}</strong><br>
+          ${item.time}<br>
+          ${item.place.join("<br>")}
+        </p>
+        <figure class="history__poster">
+          <img src="${item.poster}" alt="Poster van de AI-Dojo op ${item.date}" width="1536" height="1024" loading="lazy">
+        </figure>
+      </article>
+    `).join("");
+
+    if (location.hash === "#vorige") {
+      document.getElementById("vorige").open = true;
+    }
   </script>
 </body>
 </html>
