@@ -13,7 +13,7 @@ window.AI_DOJO = {
   past: [
     {
       date: "Dinsdag 14 juli 2026",
-      time: "14:00 – 16:00",
+      time: "13:00 – 15:00",
       place: ["Fontys AI-Lab", "TQ4.1-403, Strijp-T gebouw Q (over de loopbrug)"],
       poster: "ai.dojo.14juli2026.jpg",
     },
