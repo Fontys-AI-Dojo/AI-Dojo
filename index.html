@@ -19,7 +19,7 @@
   </div>
 
   <header class="hero">
-    <p class="hero__eyebrow">Fontys · <span data-bind="eyebrow">Nexus</span> 🦝</p>
+    <p class="hero__eyebrow"><span data-bind="eyebrow">Fontys</span> 🦝</p>
     <h1 class="hero__title">AI-Dojo</h1>
     <p class="hero__tagline">Learn by prutsing</p>
     <p class="hero__subtitle">Come and fail with the professionals.</p>
@@ -185,16 +185,21 @@
       return parts.length >= 2 ? parts.slice(-2).join(" ") : withoutYear;
     }
 
-    setText("dateShort", posterDate(current.date));
+    const posterWhen = posterDate(current.date) + (current.tentative ? "?" : "");
+    setText("dateShort", posterWhen);
     setText("time", current.time);
-    setText("eyebrow", current.place[0].replace(/^Gebouw\s+/i, ""));
+
+    const building = (current.place[0] || "").replace(/^Gebouw\s+/i, "");
+    const knownBuilding = building && !/^nog niet/i.test(building);
+    setText("eyebrow", knownBuilding ? `Fontys · ${building}` : "Fontys");
 
     document.querySelectorAll('[data-bind="placeLines"]').forEach((node) => {
       node.innerHTML = current.place.join("<br>");
     });
 
-    document.querySelector('[data-bind="whenSticky"]').innerHTML =
-      `<strong>${current.date}</strong><br>${current.time}`;
+    const whenBits = [`<strong>${current.date}</strong>`];
+    if (current.time) whenBits.push(current.time);
+    document.querySelector('[data-bind="whenSticky"]').innerHTML = whenBits.join("<br>");
 
     document.querySelector('[data-bind="whereSticky"]').innerHTML =
       placeHtml(current.place);
@@ -206,8 +211,10 @@
     }
 
     const description = document.querySelector('meta[name="description"]');
-    description.content =
-      `AI-Dojo voor Fontys-people — ${current.date}, ${current.time}, ${current.place.join(", ")}.`;
+    const whenWhere = [current.date, current.time, current.place.join(", ")].filter(Boolean).join(", ");
+    description.content = current.tentative
+      ? `AI-Dojo voor Fontys-people — gerucht: ${whenWhere}.`
+      : `AI-Dojo voor Fontys-people — ${whenWhere}.`;
 
     const history = document.querySelector('[data-bind="history"]');
     history.innerHTML = edition.past.map((item) => `
@@ -217,9 +224,9 @@
           ${item.time}<br>
           ${item.place.join("<br>")}
         </p>
-        <figure class="history__poster">
+        ${item.poster ? `<figure class="history__poster">
           <img src="${item.poster}" alt="Poster van de AI-Dojo op ${item.date}" width="1536" height="1024" loading="lazy">
-        </figure>
+        </figure>` : ""}
       </article>
     `).join("");
 
