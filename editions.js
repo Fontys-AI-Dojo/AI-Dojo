@@ -4,11 +4,10 @@
 window.AI_DOJO = {
   email: "c.crombach@fontys.nl",
   current: {
-    date: "Donderdag 4 februari 2027",
-    time: "",
-    place: ["Nog niet bekend"],
-    placeNote: "Gerucht: dit zou de volgende keer kunnen zijn. Tijd en plek zijn nog niet vast.",
-    tentative: true,
+    date: "Woensdag 3 februari 2027",
+    time: "13:00 – 15:00",
+    place: ["ExploreLab", "R13"],
+    tentative: false,
   },
   past: [
     {
